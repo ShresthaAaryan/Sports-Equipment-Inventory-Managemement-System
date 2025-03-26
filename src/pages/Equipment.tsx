@@ -4,6 +4,8 @@ import { Search, Filter, PlusCircle } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import EquipmentCard from '@/components/equipment/EquipmentCard';
 import EquipmentDetailModal from '@/components/equipment/EquipmentDetailModal';
+import EquipmentEditForm from '@/components/equipment/EquipmentEditForm';
+import DeleteConfirmationDialog from '@/components/equipment/DeleteConfirmationDialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { Dialog } from '@/components/ui/dialog';
 
 // Mock data
 const mockEquipment = [
@@ -137,15 +140,52 @@ const mockEquipment = [
   },
 ];
 
+// Type for a single equipment item
+interface Equipment {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  status: 'Available' | 'In Use' | 'Maintenance' | 'Retired';
+  quantity: number;
+  purchaseDate: string;
+  purchasePrice: number;
+  supplier: string;
+  location: string;
+  imageUrl: string;
+  maintenanceHistory: Array<{
+    date: string;
+    description: string;
+  }>;
+}
+
+// Form values type
+interface FormValues {
+  name: string;
+  description: string;
+  category: string;
+  status: 'Available' | 'In Use' | 'Maintenance' | 'Retired';
+  quantity: number;
+  purchaseDate: string;
+  purchasePrice: number;
+  supplier: string;
+  location: string;
+  imageUrl: string;
+}
+
 const Equipment = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [selectedEquipment, setSelectedEquipment] = useState<typeof mockEquipment[0] | null>(null);
+  const [equipment, setEquipment] = useState<Equipment[]>(mockEquipment);
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isNewEquipment, setIsNewEquipment] = useState(false);
   const { toast } = useToast();
 
-  const filteredEquipment = mockEquipment.filter((item) => {
+  const filteredEquipment = equipment.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           item.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
@@ -154,35 +194,77 @@ const Equipment = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const categories = Array.from(new Set(mockEquipment.map(item => item.category)));
+  const categories = Array.from(new Set(equipment.map(item => item.category)));
   
   const handleViewDetails = (id: string) => {
-    const equipment = mockEquipment.find(item => item.id === id);
-    if (equipment) {
-      setSelectedEquipment(equipment);
+    const equipmentItem = equipment.find(item => item.id === id);
+    if (equipmentItem) {
+      setSelectedEquipment(equipmentItem);
       setModalOpen(true);
     }
   };
 
   const handleEdit = (id: string) => {
-    toast({
-      title: "Edit equipment",
-      description: `You selected to edit equipment ID: ${id}`,
-    });
+    const equipmentItem = equipment.find(item => item.id === id);
+    if (equipmentItem) {
+      setSelectedEquipment(equipmentItem);
+      setIsNewEquipment(false);
+      setEditModalOpen(true);
+    }
   };
 
   const handleDelete = (id: string) => {
-    toast({
-      title: "Delete equipment",
-      description: `You selected to delete equipment ID: ${id}`,
-    });
+    const equipmentItem = equipment.find(item => item.id === id);
+    if (equipmentItem) {
+      setSelectedEquipment(equipmentItem);
+      setDeleteDialogOpen(true);
+    }
   };
 
   const handleAddNew = () => {
-    toast({
-      title: "Add new equipment",
-      description: "You selected to add new equipment",
-    });
+    setSelectedEquipment(null);
+    setIsNewEquipment(true);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEquipment = (values: FormValues) => {
+    // For adding new equipment
+    if (isNewEquipment) {
+      const newEquipment = {
+        ...values,
+        id: `${equipment.length + 1}`,
+        maintenanceHistory: []
+      };
+      setEquipment([...equipment, newEquipment]);
+      toast({
+        title: "Equipment added",
+        description: `${values.name} has been added to inventory.`,
+      });
+    } 
+    // For updating existing equipment
+    else if (selectedEquipment) {
+      setEquipment(equipment.map(item => 
+        item.id === selectedEquipment.id 
+          ? { ...item, ...values } 
+          : item
+      ));
+      toast({
+        title: "Equipment updated",
+        description: `${values.name} has been updated.`,
+      });
+    }
+    setEditModalOpen(false);
+  };
+
+  const handleConfirmDelete = () => {
+    if (selectedEquipment) {
+      setEquipment(equipment.filter(item => item.id !== selectedEquipment.id));
+      toast({
+        title: "Equipment deleted",
+        description: `${selectedEquipment.name} has been removed from inventory.`,
+      });
+      setDeleteDialogOpen(false);
+    }
   };
 
   return (
@@ -273,10 +355,29 @@ const Equipment = () => {
         </div>
       )}
 
+      {/* View Equipment Details Modal */}
       <EquipmentDetailModal
         equipment={selectedEquipment}
         open={modalOpen}
         onOpenChange={setModalOpen}
+      />
+      
+      {/* Edit Equipment Modal */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <EquipmentEditForm
+          equipment={selectedEquipment}
+          onSave={handleSaveEquipment}
+          onCancel={() => setEditModalOpen(false)}
+          isNew={isNewEquipment}
+        />
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemName={selectedEquipment?.name || "this equipment"}
       />
     </Layout>
   );
