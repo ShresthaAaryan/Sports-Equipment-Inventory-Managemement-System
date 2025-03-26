@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   ChevronLeft, ChevronRight, LayoutDashboard, Package, ShoppingCart, 
@@ -7,13 +7,28 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const Sidebar = () => {
+interface SidebarProps {
+  onToggle?: (collapsed: boolean) => void;
+}
+
+const Sidebar = ({ onToggle }: SidebarProps) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleSidebar = () => {
-    setCollapsed(!collapsed);
+    const newCollapsedState = !collapsed;
+    setCollapsed(newCollapsedState);
+    if (onToggle) {
+      onToggle(newCollapsedState);
+    }
   };
+
+  useEffect(() => {
+    // Call onToggle on initial render to sync state
+    if (onToggle) {
+      onToggle(collapsed);
+    }
+  }, []);
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },

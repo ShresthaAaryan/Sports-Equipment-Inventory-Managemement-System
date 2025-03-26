@@ -48,7 +48,7 @@ const Index = () => {
             <span className="bg-primary text-white font-bold rounded-lg h-8 w-8 flex items-center justify-center">SE</span>
             <span className="text-lg font-semibold tracking-tight">SEIMS</span>
           </div>
-          <div>
+          <div className="hidden sm:flex">
             <Button variant="link" onClick={() => navigate('/dashboard')}>
               About
             </Button>
@@ -63,21 +63,22 @@ const Index = () => {
       </header>
 
       <main className="flex-1">
-        <section className="py-16 px-6">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <section className="py-8 md:py-16 px-4 md:px-6">
+          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
+              className="text-center md:text-left"
             >
-              <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
                 Sports Equipment Inventory Management System
               </h1>
-              <p className="mt-6 text-lg text-muted-foreground">
+              <p className="mt-4 md:mt-6 text-base md:text-lg text-muted-foreground">
                 Streamline your sports equipment management with our comprehensive inventory system. 
                 Track, procure, and sell equipment with ease.
               </p>
-              <div className="mt-8 flex gap-4">
+              <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                 <Button size="lg" onClick={() => navigate('/dashboard')}>
                   Get Started <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -98,16 +99,16 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="py-16 px-6 bg-muted/30">
+        <section className="py-8 md:py-16 px-4 md:px-6 bg-muted/30">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold">Key Features</h2>
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold">Key Features</h2>
               <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
                 Our system provides all the tools you need to efficiently manage your sports equipment inventory
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
