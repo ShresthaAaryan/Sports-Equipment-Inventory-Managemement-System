@@ -9,7 +9,176 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      equipment: {
+        Row: {
+          category: string
+          condition: string
+          created_at: string
+          created_by: string | null
+          id: string
+          location: string | null
+          name: string
+          notes: string | null
+          purchase_date: string | null
+          purchase_price: number | null
+          quantity: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          condition: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          notes?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          condition?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          notes?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      procurement: {
+        Row: {
+          approval_date: string | null
+          approved_by: string | null
+          created_at: string
+          estimated_price: number | null
+          id: string
+          item_name: string
+          notes: string | null
+          quantity: number
+          requested_by: string | null
+          requested_date: string
+          status: string
+          updated_at: string
+          vendor: string | null
+        }
+        Insert: {
+          approval_date?: string | null
+          approved_by?: string | null
+          created_at?: string
+          estimated_price?: number | null
+          id?: string
+          item_name: string
+          notes?: string | null
+          quantity: number
+          requested_by?: string | null
+          requested_date?: string
+          status?: string
+          updated_at?: string
+          vendor?: string | null
+        }
+        Update: {
+          approval_date?: string | null
+          approved_by?: string | null
+          created_at?: string
+          estimated_price?: number | null
+          id?: string
+          item_name?: string
+          notes?: string | null
+          quantity?: number
+          requested_by?: string | null
+          requested_date?: string
+          status?: string
+          updated_at?: string
+          vendor?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sales: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_name: string
+          equipment_id: string | null
+          id: string
+          notes: string | null
+          payment_method: string | null
+          quantity: number
+          sale_date: string
+          sale_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_name: string
+          equipment_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          quantity: number
+          sale_date?: string
+          sale_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string
+          equipment_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          quantity?: number
+          sale_date?: string
+          sale_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

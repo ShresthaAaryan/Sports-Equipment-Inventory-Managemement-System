@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -15,17 +16,15 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, allow any login with valid format
       if (email && password.length >= 6) {
+        await login(email, password);
         toast({
           title: "Login successful",
           description: "Welcome to the Sports Equipment Inventory Management System!",
@@ -132,8 +131,8 @@ const LoginForm = () => {
       <div className="mt-6 text-center">
         <p className="text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Button variant="link" className="p-0 h-auto">
-            Contact administrator
+          <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/auth?tab=signup')}>
+            Sign up
           </Button>
         </p>
       </div>
